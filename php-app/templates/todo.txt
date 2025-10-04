@@ -1,0 +1,1 @@
+I have no idea how these work. Some HTML bullshit with placeholders kinda like flask ($incident['description'] etc)

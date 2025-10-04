@@ -1,0 +1,3 @@
+pretty much same as the flask app
+
+just use fiverr, lol
