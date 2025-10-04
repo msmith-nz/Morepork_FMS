@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  morepork-flask:
+    build:
+      context: ./flask-app
+      dockerfile: Dockerfile
+    container_name: morepork-flask
+    ports:
+      - "172.31.28.92:5000:5000"
+    volumes:
+      - flask_data:/app/data
+      - ./flags/flask:/app/TQrep3k7:ro
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=false
+    networks:
+      - morepork-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    depends_on:
+      - morepork-spring
+
+  morepork-php:
+    build:
+      context: ./php-app
+      dockerfile: Dockerfile
+    container_name: morepork-php
+    ports:
+      - "172.31.28.92:8080:80"
+    volumes:
+      - ./flags/php:/var/www/ySG8XnJd:ro
+      - ./php-app/uploads:/var/www/uploads:ro
+      - ./php-app/templates:/var/www/templates:ro
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html
+    networks:
+      - morepork-network
+    depends_on:
+      - morepork-flask
+
+  morepork-spring:
+    build:
+      context: ./java-app
+      dockerfile: Dockerfile
+    container_name: morepork-spring
+    expose:
+      - "8081"
+    environment:
+      - SERVER_PORT=8081
+    networks:
+      - morepork-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  flask_data:
+    driver: local
+
+networks:
+  morepork-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
