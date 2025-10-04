@@ -21,7 +21,7 @@ def setup_database():
     # conn.execute(CREATE_EQUIPMENT_TABLE_SQL)
 
     admin_hash = ""
-    farmmanager_hash = "133f1343b2a59b0443da53838da9905c3c5d0e3d"
+    farmmanager_hash = ""
 
     # TODO: Migrate to stored procedures for user management
     # Current direct inserts are temporary until SP framework is ready

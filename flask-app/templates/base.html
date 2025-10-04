@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" class="dark h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Morepork Station Farm Management{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        farm: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            200: '#bbf7d0',
+                            300: '#86efac',
+                            400: '#4ade80',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col">
+    {% if session.user_id %}
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-tractor text-farm-500 text-2xl"></i>
+                        <span class="ml-2 text-xl font-bold text-white">Morepork Station</span>
+                    </div>
+                    <div class="hidden md:block ml-10">
+                        <div class="flex items-baseline space-x-4">
+                            <a href="{{ url_for('dashboard') }}" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-chart-line mr-1"></i>Dashboard
+                            </a>
+                            <a href="{{ url_for('equipment_list') }}" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-cogs mr-1"></i>Equipment
+                            </a>
+                            <a href="{{ url_for('inventory_search') }}" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-search mr-1"></i>Search
+                            </a>
+                            <a href="{{ url_for('webcam_viewer') }}" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-video mr-1"></i>Webcams
+                            </a>
+                            <a href="{{ url_for('reports_dashboard') }}" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-file-alt mr-1"></i>Reports
+                            </a>
+                            <a href="{{ url_for('system_status') }}" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>Status
+                            </a>
+                            {% if session.role == 'admin' %}
+                            <a href="/safety/" class="text-orange-400 hover:text-orange-300 px-3 py-2 rounded-md text-sm font-medium">
+                                <i class="fas fa-shield-alt mr-1"></i>Safety Portal
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <div class="text-gray-300 text-sm mr-4">
+                        <i class="fas fa-user-circle mr-1"></i>
+                        {{ session.username }} ({{ session.role }})
+                    </div>
+                    <a href="{{ url_for('user_settings') }}" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-cog"></i>
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium ml-2">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <main class="flex-grow {% if session.user_id %}pt-6{% else %}pt-0{% endif %}">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} bg-{% if category == 'error' %}red{% elif category == 'success' %}green{% else %}blue{% endif %}-600 text-white p-4 rounded-md mb-2">
+                            <i class="fas fa-{% if category == 'error' %}exclamation-circle{% elif category == 'success' %}check-circle{% else %}info-circle{% endif %} mr-2"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="bg-gray-800 border-t border-gray-700 mt-auto">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="text-center text-gray-400 text-sm">
+                <p>&copy; 2024 Morepork Station Farm Management System. All rights reserved.</p>
+                <p class="mt-1">Agricultural Operations Management Platform</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function showMessage(message, type = 'info') {
+            const alertClass = type === 'error' ? 'bg-red-600' : type === 'success' ? 'bg-green-600' : 'bg-blue-600';
+            const iconClass = type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle';
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `${alertClass} text-white p-4 rounded-md mb-2 fixed top-4 right-4 z-50 max-w-md`;
+            alertDiv.innerHTML = `
+                <i class="fas ${iconClass} mr-2"></i>
+                ${message}
+                <button onclick="this.parentElement.remove()" class="float-right ml-4 text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
